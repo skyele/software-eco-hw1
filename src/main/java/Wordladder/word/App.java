@@ -21,7 +21,6 @@ public class App
     		HashSet<String>words = read_words();	//read words in the dictionary
     	
     		String word1 = "", word2 = "";
-    		int looptime = 0;
     		
     		while (true) {
     			System.out.println();   //add a empty line after one inquiry
@@ -63,16 +62,23 @@ public class App
     				System.out.println("The two words must be different.");
     			}
     			else {
-    				build_ladder(word1, word2, words);
-    				looptime =0;
-    				continue;
+    				Stack<String> word_ladder = build_ladder(word1, word2, words);
+    				if(word_ladder != null)
+    				{
+    					System.out.println("A ladder from " + word2 + " back to " + word1 + ':' );
+					while (!word_ladder.empty()) {
+						System.out.print( word_ladder.pop() + ' ');    //output of wordladder
+					}
+				}
+    				else
+    				{
+					System.out.println("No word ladder found from " + word2 + " back to " + word1+'.');
+    				}
+				continue;
     			}
-    			looptime++;
     		}
     		System.out.println("Have a nice day.");    //program ends
     	}
-    
-    
     static File get_file() {
     		String filename = new String();
     		System.out.println("Dictionary file name? ");
@@ -114,12 +120,11 @@ public class App
     		return words_set;
     }		
 
-    static void build_ladder(String word1, String word2, HashSet<String> words) {  
+    static Stack<String> build_ladder(String word1, String word2, HashSet<String> words) {  
     		HashSet<String>used_words = new HashSet<String>();     //store those already used words
 	
     		ConcurrentLinkedQueue<Stack<String>>ladders = new ConcurrentLinkedQueue<Stack<String>>();
     		Stack<String>word_ladder = new Stack<String>();
-    		Stack<String>copy_wdladder = new Stack<String>();
     		String this_word = "", next_word = "";
 
     		word_ladder.push(word1);     //put the word into the ladder
@@ -142,15 +147,13 @@ public class App
     							word_ladder.push(next_word);
     							used_words.add(next_word);
     							if (next_word.equals(word2)) {               //find word2 and the loop ends
-    								System.out.println("A ladder from " + word2 + " back to " + word1 + ':' );
-    								while (!word_ladder.empty()) {
-    									System.out.print( word_ladder.pop() + ' ');    //output of wordladder
-    								}
-    								return;
+    								
+    								return word_ladder;	// Find the answer
+    							
     							}	
     							else {
-    								copy_wdladder = (Stack<String>) word_ladder.clone();      //if next word is not word2,then put the ladder into the queue
-    								ladders.add(copy_wdladder);
+    								//copy_wdladder = (Stack<String>) word_ladder.clone();      //if next word is not word2,then put the ladder into the queue
+    								ladders.add((Stack<String>) word_ladder.clone());
     								word_ladder.pop();      //the first ladder out 
     							}
     						}
@@ -158,7 +161,7 @@ public class App
     				}
     			}
     		}
-    		System.out.println("No word ladder found from " + word2 + " back to " + word1+'.');
+    		return null;
 
     }	
 }
